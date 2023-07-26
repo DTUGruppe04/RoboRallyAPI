@@ -32,6 +32,12 @@ public class GameConfigController {
         writeToJSONFile(playerNumber, "Servers/" + serverID + "/playerNumberHandler.txt");
     }
 
+    @PostMapping(path = "/Servers/mapConfig")
+    public void updateMapConfig(@RequestBody String JSONString, @RequestParam String serverID){
+        String path = "Servers/" + serverID + "/mapConfig.json";
+        writeToJSONFile(JSONString, path);
+    }
+
     @GetMapping(path = "/Servers")
     public String joinServer(@RequestParam String serverID){
         String path = "Servers/" + serverID + "/mapConfig.json";
@@ -43,7 +49,7 @@ public class GameConfigController {
         int playerNumber = Integer.parseInt(readFromJSONFile(path));
         if (playerNumber != 1) {
             writeToJSONFile(String.valueOf(playerNumber-1), path);
-            return String.valueOf(playerNumber-1);
+            return String.valueOf(playerNumber);
         } else {
             return "0";
         }
@@ -60,8 +66,12 @@ public class GameConfigController {
         JsonObject mapConfigFromClient = new JsonParser().parse(JSONString).getAsJsonObject();
         JsonObject mapConfigFromServer = new JsonParser().parse(readFromJSONFile(path)).getAsJsonObject();
         JsonArray jsonArrayClient = mapConfigFromClient.getAsJsonArray("players");
-        JsonElement clientPlayer = jsonArrayClient.get(Integer.parseInt(playerNumber));
-        mapConfigFromServer.getAsJsonArray("players").set(Integer.parseInt(playerNumber), clientPlayer);
+        JsonElement clientPlayer = jsonArrayClient.get(Integer.parseInt(playerNumber)-1);
+        System.out.println(clientPlayer);
+        System.out.println(mapConfigFromServer);
+        System.out.println(mapConfigFromClient);
+        System.out.println(playerNumber);
+        mapConfigFromServer.getAsJsonArray("players").set(Integer.parseInt(playerNumber)-1, clientPlayer);
         writeToJSONFile(mapConfigFromServer.toString(), path);
     }
 
