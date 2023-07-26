@@ -48,6 +48,11 @@ public class GameConfigController {
             return "0";
         }
     }
+    @GetMapping(path = "/Servers/mapConfig")
+    public String getMapConfig(@RequestParam String serverID){
+        String path = "Servers/" + serverID + "/mapConfig.json";
+        return readFromJSONFile(path);
+    }
 
     @PutMapping(path = "/Servers/Player")
     public void updateSpecificPlayer(@RequestBody String JSONString, @RequestParam String serverID, @RequestParam String playerNumber) {
@@ -56,9 +61,6 @@ public class GameConfigController {
         JsonObject mapConfigFromServer = new JsonParser().parse(readFromJSONFile(path)).getAsJsonObject();
         JsonArray jsonArrayClient = mapConfigFromClient.getAsJsonArray("players");
         JsonElement clientPlayer = jsonArrayClient.get(Integer.parseInt(playerNumber));
-        System.out.println(clientPlayer);
-        System.out.println(mapConfigFromServer);
-        System.out.println(mapConfigFromClient);
         mapConfigFromServer.getAsJsonArray("players").set(Integer.parseInt(playerNumber), clientPlayer);
         writeToJSONFile(mapConfigFromServer.toString(), path);
     }
